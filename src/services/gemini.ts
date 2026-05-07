@@ -2,7 +2,7 @@ import { GoogleGenAI } from '@google/genai';
 
 // Берём тот же ключ и модель, что и в основном коде
 const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
-const model = import.meta.env.VITE_GEMINI_MODEL || 'gemini-3.1-flash';
+const model = import.meta.env.VITE_GEMINI_MODEL || 'gemini-2.0-flash';
 
 if (!apiKey) {
   console.error('VITE_GEMINI_API_KEY is not defined. Provide it in .env.local / Vercel env.');

@@ -1,7 +1,9 @@
 import { GoogleGenAI } from '@google/genai';
 
 const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
-const model = import.meta.env.VITE_GEMINI_MODEL || 'gemini-3.1-flash';
+// Рабочий дефолт: существующая модель Gemini
+// Можно переопределить через VITE_GEMINI_MODEL, например на "gemini-2.0-pro"
+const model = import.meta.env.VITE_GEMINI_MODEL || 'gemini-2.0-flash';
 
 if (!apiKey) {
   console.error("VITE_GEMINI_API_KEY is not defined. Provide it in .env.local.");
