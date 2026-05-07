@@ -1,0 +1,6 @@
+{
+  "name": "PromptEngineer",
+  "description": "An AI-powered application that transforms chaotic, messy text into highly professional, structured LLM prompts. Features Google Auth, Gemini 2.5 Pro, and a starry space UI.",
+  "requestFramePermissions": [],
+  "majorCapabilities": []
+}

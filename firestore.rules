@@ -1,0 +1,31 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    function isSignedIn() { return request.auth != null && request.auth.token.email_verified == true; }
+    function incoming() { return request.resource.data; }
+    function existing() { return resource.data; }
+    function isValidId(id) { return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$'); }
+    
+    function isValidPrompt(data) {
+      return data.keys().hasAll(['userId', 'originalPrompt', 'enhancedPrompt', 'createdAt']) &&
+             data.keys().size() == 4 &&
+             data.userId == request.auth.uid &&
+             data.originalPrompt is string && data.originalPrompt.size() <= 50000 &&
+             data.enhancedPrompt is string && data.enhancedPrompt.size() <= 50000 &&
+             data.createdAt == request.time;
+    }
+
+    match /prompts/{promptId} {
+      allow get: if isSignedIn() && isValidId(promptId) && existing().userId == request.auth.uid;
+      allow list: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow create: if isSignedIn() && isValidId(promptId) && isValidPrompt(incoming());
+      // No updates needed - prompts are immutable history
+      allow update: if false;
+      allow delete: if isSignedIn() && isValidId(promptId) && existing().userId == request.auth.uid;
+    }
+  }
+}

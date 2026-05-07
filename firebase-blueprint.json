@@ -1,0 +1,22 @@
+{
+  "entities": {
+    "Prompt": {
+      "title": "Prompt",
+      "description": "A generated professional prompt.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "originalPrompt": { "type": "string" },
+        "enhancedPrompt": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "originalPrompt", "enhancedPrompt", "createdAt"]
+    }
+  },
+  "firestore": {
+    "prompts/{promptId}": {
+      "schema": "Prompt",
+      "description": "User generated prompts history."
+    }
+  }
+}
