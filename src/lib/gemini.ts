@@ -1,6 +1,7 @@
 import { GoogleGenAI } from '@google/genai';
 
 const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+const model = import.meta.env.VITE_GEMINI_MODEL || 'gemini-3.1-flash';
 
 if (!apiKey) {
   console.error("VITE_GEMINI_API_KEY is not defined. Provide it in .env.local.");
@@ -20,14 +21,22 @@ Additionally, perform a complete UI/UX overhaul. The design must be sleek and co
 export async function generateProfessionalPrompt(userRequest: string): Promise<string> {
   if (!apiKey) throw new Error("Missing Gemini API Key");
   
-  const response = await ai.models.generateContent({
-    model: 'gemini-2.5-pro',
-    contents: userRequest,
-    config: {
-      systemInstruction: SYSTEM_INSTRUCTION,
-      temperature: 0.7,
-    }
-  });
+  try {
+    const response = await ai.models.generateContent({
+      model,
+      contents: userRequest,
+      config: {
+        systemInstruction: SYSTEM_INSTRUCTION,
+        temperature: 0.7,
+      }
+    });
 
-  return response.text || "Failed to generate prompt.";
+    return response.text || "Failed to generate prompt.";
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : String(e);
+    if (msg.includes('"code":429') || msg.includes('RESOURCE_EXHAUSTED') || msg.includes('Quota exceeded')) {
+      throw new Error("Gemini quota exceeded (429). Add billing / increase quota, or wait and retry.");
+    }
+    throw e;
+  }
 }

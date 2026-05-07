@@ -76,14 +76,22 @@ export const PromptInterface: React.FC = () => {
     setResult(null);
     setCopied(false);
 
+    let enhancedPrompt: string;
     try {
-      const enhancedPrompt = await generateProfessionalPrompt(input);
-      
-      // Save to Firebase
+      enhancedPrompt = await generateProfessionalPrompt(input);
+    } catch (e) {
+      console.error('Error generating prompt', e);
+      setError(e instanceof Error ? e.message : 'An error occurred while generating.');
+      setIsGenerating(false);
+      return;
+    }
+
+    try {
+      // Save to Firebase (separate try so Gemini errors never become "Firestore Error")
       const docRef = await addDoc(collection(db, 'prompts'), {
         userId: user.uid,
         originalPrompt: input,
-        enhancedPrompt: enhancedPrompt,
+        enhancedPrompt,
         createdAt: serverTimestamp()
       });
 
@@ -95,7 +103,6 @@ export const PromptInterface: React.FC = () => {
       setInput('');
     } catch (e) {
       handleFirestoreError(e, OperationType.CREATE, 'prompts');
-      setError(e instanceof Error ? e.message : 'An error occurred while generating.');
     } finally {
       setIsGenerating(false);
     }
